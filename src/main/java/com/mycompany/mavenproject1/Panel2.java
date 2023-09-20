@@ -10,10 +10,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -49,8 +52,8 @@ public class Panel2 extends javax.swing.JPanel {
 
     public Panel2(Map<String, String> path) {
         initComponents();
-        this.setBounds(0, 0, 600, 800);
-        this.setBackground(Color.gray);
+        this.setBounds(0, 0, 800, 600);
+        this.setBackground(Color.LIGHT_GRAY);
         this.paths = path;
     }
 
@@ -65,13 +68,28 @@ public class Panel2 extends javax.swing.JPanel {
 
         jLabel2 = new javax.swing.JLabel();
         generarFacturas = new javax.swing.JToggleButton();
+        jLabel1 = new javax.swing.JLabel();
+        generarProductoTerminado = new javax.swing.JToggleButton();
 
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel2.setText("Generar Facturas");
 
+        generarFacturas.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         generarFacturas.setText("Generar");
         generarFacturas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 generarFacturasActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel1.setText("Generar Producto Terminado");
+
+        generarProductoTerminado.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        generarProductoTerminado.setText("Generar");
+        generarProductoTerminado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                generarProductoTerminadoActionPerformed(evt);
             }
         });
 
@@ -82,12 +100,16 @@ public class Panel2 extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(79, 79, 79)
-                        .addComponent(jLabel2))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(93, 93, 93)
-                        .addComponent(generarFacturas)))
-                .addContainerGap(210, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(generarProductoTerminado)
+                            .addComponent(generarFacturas)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(79, 79, 79)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2))))
+                .addContainerGap(69, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -96,147 +118,43 @@ public class Panel2 extends javax.swing.JPanel {
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(generarFacturas)
-                .addContainerGap(226, Short.MAX_VALUE))
+                .addGap(21, 21, 21)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(generarProductoTerminado)
+                .addContainerGap(124, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void generarFacturasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generarFacturasActionPerformed
         // TODO add your handling code here:
-        try {
-            List<Map<Integer, List<String>>> archivoGeneral = new ArrayList<>();
-            FileInputStream file = new FileInputStream(new File(this.paths.get("RP")));
-            Workbook workbook = new XSSFWorkbook(file);
-            int numHojas = workbook.getNumberOfSheets();
-
-            for (int i = 0; i <= numHojas - 1; i++) {
-                Sheet sheet = workbook.getSheetAt(i);
-
-                Map<Integer, List<String>> data = new HashMap<>();
-                int j = 0;
-                for (Row row : sheet) {
-                    data.put(j, new ArrayList<String>());
-                    for (Cell cell : row) {
-                        switch (cell.getCellType()) {
-                            case STRING:
-                                data.get(new Integer(j)).add(cell.getRichStringCellValue().getString());
-                                break;
-                            case NUMERIC:
-                                if (DateUtil.isCellDateFormatted(cell)) {
-                                    data.get(j).add(cell.getDateCellValue() + "");
-                                } else {
-                                    data.get(j).add(cell.getNumericCellValue() + "");
-                                }
-                                break;
-                            case BOOLEAN:
-                                data.get(j).add(cell.getBooleanCellValue() + "");
-                                break;
-                            case FORMULA:
-                                data.get(j).add(cell.getCellFormula() + "");
-                                break;
-                            default:
-                                data.get(new Integer(j)).add(" ");
-                        }
-
-                    }
-
-                    j++;
-
-                }
-                archivoGeneral.add(data);
-
-            }
-            generarFacturaExcel(archivoGeneral);
-        } catch (Exception ex) {
-            JOptionPane.showConfirmDialog(null, "Cargue el reporte de produccion");
-            Logger.getLogger(Panel1.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    
+       
+        FCGenerador generator = new FCGenerador(paths);
+        generator.cargarFacturas();
 
     }//GEN-LAST:event_generarFacturasActionPerformed
 
-    private List<Map<Integer, List<String>>> getFacturasPorRuc(String ruc, List<Map<Integer, List<String>>> archivoGeneral) {
-        List<Map<Integer, List<String>>> res = new ArrayList<>();
-        for (var factura : archivoGeneral) {
-            var r = factura.get(2).get(0).split("-");
+    private void generarProductoTerminadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generarProductoTerminadoActionPerformed
+        // TODO add your handling code here:
+        PTGenerador generator = new PTGenerador(paths);
+        generator.cargarFacturas();
+    }//GEN-LAST:event_generarProductoTerminadoActionPerformed
 
-            if (r[r.length - 1].trim().equals(ruc.trim())) {
+   
 
-                res.add(factura);
-            }
-        }
-        System.out.println("Resultado");
-        System.out.println(res.size());
-        return res;
-    }
 
-    public List<String> extraerNumeros(String input) {
-        List<String> numeros = new ArrayList<>();
-        Pattern pattern = Pattern.compile("\\d{13}");
-        Matcher matcher = pattern.matcher(input);
 
-        while (matcher.find()) {
-            numeros.add(matcher.group());
-        }
+  
 
-        return numeros;
-    }
+   
 
-    public List<String> obtenerRucs(List<String> rucs) {
-        List<String> numeros = new ArrayList<>();
-        for (var input : rucs) {
-            Pattern pattern = Pattern.compile("\\d{13}");
-            Matcher matcher = pattern.matcher(input);
+   
 
-            while (matcher.find()) {
-                numeros.add(matcher.group());
-            }
-        }
-
-        return numeros;
-    }
-
-    private void generarFacturaExcel(List<Map<Integer, List<String>>> archivoGeneral) {
-        var listadoRUC = archivoGeneral.stream().map(x -> (x.get(2).get(0))).distinct().toList();
-        var listRuc = obtenerRucs(listadoRUC);
-
-        listRuc.stream().forEach(x -> System.out.println(getFacturasPorRuc(x, archivoGeneral)));
-        List<String> cabecera = List.of("Subpartida", "Complementario", "Suplementario", "Numero de factura", "Numero de item");
-        List<String> cabecera2 = List.of("prdt_hs_part_cd", "prdt_hs_cpmt_cd", "prdt_hs_spmt_cd", "ntfc_no", "ntfc_de");
-        //listadoRUC.stream().forEach(cnsmr);
-        Workbook workbook = new XSSFWorkbook();
-
-        Sheet sheet = workbook.createSheet();
-        Row header = sheet.createRow(0);
-        for (int i = 0; i <= cabecera.size() - 1; i++) {
-            header.createCell(i).setCellValue(cabecera.get(i));
-
-        }
-        Row header2 = sheet.createRow(1);
-        for (int i = 0; i <= cabecera2.size() - 1; i++) {
-            header2.createCell(i).setCellValue(cabecera2.get(i));
-        }
-
-        File currDir = new File(".");
-        String path = currDir.getAbsolutePath();
-        String fileLocation = path.substring(0, path.length() - 1) + "temp.xlsx";
-
-        FileOutputStream outputStream;
-        try {
-            outputStream = new FileOutputStream(fileLocation);
-            try {
-                workbook.write(outputStream);
-            } catch (IOException ex) {
-                Logger.getLogger(Panel2.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            workbook.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Panel2.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Panel2.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton generarFacturas;
+    private javax.swing.JToggleButton generarProductoTerminado;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
 }

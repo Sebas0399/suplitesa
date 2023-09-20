@@ -18,6 +18,8 @@ import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -42,8 +44,8 @@ public class Panel1 extends javax.swing.JPanel {
      */
     public Panel1() {
         initComponents();
-        this.setBounds(0, 0, 600, 800);
-        this.setBackground(Color.gray);
+        this.setBounds(0, 0, 800, 600);
+        this.setBackground(Color.LIGHT_GRAY);
         paths=new HashMap<>();
     }
 
@@ -63,6 +65,7 @@ public class Panel1 extends javax.swing.JPanel {
         cargarInsumos = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
 
+        cargarListadoVentas.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         cargarListadoVentas.setText("Cargar");
         cargarListadoVentas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -70,10 +73,13 @@ public class Panel1 extends javax.swing.JPanel {
             }
         });
 
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel1.setText("Listado Ventas");
 
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel2.setText("Reporte de producción");
 
+        cargarReporteProduccion.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         cargarReporteProduccion.setText("Cargar");
         cargarReporteProduccion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -81,6 +87,7 @@ public class Panel1 extends javax.swing.JPanel {
             }
         });
 
+        cargarInsumos.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         cargarInsumos.setText("Cargar");
         cargarInsumos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -88,29 +95,30 @@ public class Panel1 extends javax.swing.JPanel {
             }
         });
 
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel3.setText("Insumos");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(132, 132, 132)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(35, 35, 35)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel2)
                     .addComponent(jLabel1)
                     .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 129, Short.MAX_VALUE)
+                .addGap(66, 66, 66)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(cargarInsumos)
                     .addComponent(cargarListadoVentas)
                     .addComponent(cargarReporteProduccion))
-                .addGap(160, 160, 160))
+                .addContainerGap(248, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(41, 41, 41)
+                .addGap(64, 64, 64)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cargarListadoVentas)
                     .addComponent(jLabel1))
@@ -122,7 +130,7 @@ public class Panel1 extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cargarInsumos)
                     .addComponent(jLabel3))
-                .addContainerGap(159, Short.MAX_VALUE))
+                .addContainerGap(109, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -183,21 +191,21 @@ public class Panel1 extends javax.swing.JPanel {
 
     private void cargarReporteProduccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cargarReporteProduccionActionPerformed
         // TODO add your handling code here:
-        var path = cargarData();
+        var path = FileUtils.cargarData();
         if (path != null) {
             try {
                 FileInputStream file = new FileInputStream(new File(path));
-                JOptionPane.showConfirmDialog(null, "Reporte de produccion cargado correctamente");
+                JOptionPane.showMessageDialog(null, "Reporte de produccion cargado correctamente");
                 
                 getPaths().put("RP",path);
 
             } catch (FileNotFoundException ex) {
-                JOptionPane.showConfirmDialog(null, "Ocurrio un error");
+                JOptionPane.showMessageDialog(null, "Ocurrio un error");
                 Logger.getLogger(Panel1.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         } else {
-            JOptionPane.showConfirmDialog(null, "Ocurrio un error");
+            JOptionPane.showMessageDialog(null, "Ocurrio un error");
         }
 
     }//GEN-LAST:event_cargarReporteProduccionActionPerformed
@@ -206,17 +214,7 @@ public class Panel1 extends javax.swing.JPanel {
         // TODO add your handling code here:
 
     }//GEN-LAST:event_cargarInsumosActionPerformed
-    public String cargarData() {
-        var j = new JFileChooser(FileSystemView.getFileSystemView());
-        int r = j.showOpenDialog(null);
-        if (r == JFileChooser.APPROVE_OPTION) {
-            return j.getSelectedFile().getAbsolutePath();
-
-        } else {
-            return null;
-        }
-
-    }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cargarInsumos;
