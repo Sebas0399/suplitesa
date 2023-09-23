@@ -12,8 +12,10 @@ com\mycompany\mavenproject1\FCGenerador.class
 com\mycompany\mavenproject1\MPGenerador.class
 com\mycompany\mavenproject1\Panel1$1.class
 com\mycompany\mavenproject1\FCGenerador$1.class
+com\mycompany\mavenproject1\model\RenderTable.class
 com\mycompany\mavenproject1\PTGenerador$1.class
 com\mycompany\mavenproject1\model\MPTableModel.class
+com\mycompany\mavenproject1\Panel3$1.class
 com\mycompany\mavenproject1\Panel2$2.class
 com\mycompany\mavenproject1\Panel2$1.class
 com\mycompany\mavenproject1\Panel1.class

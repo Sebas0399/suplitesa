@@ -4,6 +4,7 @@
  */
 package com.mycompany.mavenproject1;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,7 +53,7 @@ public class Panel2 extends javax.swing.JPanel {
 
     public Panel2(Map<String, String> path) {
         initComponents();
-        this.setBounds(0, 0, 800, 600);
+       // this.setBounds(0, 0, 800, 600);
         this.setBackground(Color.LIGHT_GRAY);
         this.paths = path;
     }

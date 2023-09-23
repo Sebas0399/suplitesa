@@ -10,28 +10,49 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author Sebas
  */
-public class MPTableModel extends AbstractTableModel{
-    private Object[][] datos;
-    private String[] columnas;
+public class MPTableModel extends AbstractTableModel {
 
-    public MPTableModel(Object[][] datos, String[] columnas) {
-        this.datos = datos;
-        this.columnas = columnas;
+    /*private String[] columnNames = {"No. Factura asociada",
+        "Subpartida",
+        "Complementario",
+        "Suplementario",
+        "Número de serie",
+        "Número de ítem",
+        "Código",
+        "Subpartida",
+        "Complementario",
+        "Suplementario",
+        "Descripción",
+        "Tipo Unidad",
+        "Cantidad Transformado",
+        "Cantidad de Desperdicio",
+        "Cantidad de Merma"};*/
+    private String[] columnNames = {"Material","Cód. Insumo","Descripción","Empresa","",""};
+    private Object[][] data ;
+    public MPTableModel(Object[][]data){
+        this.data=data;
     }
 
     @Override
     public int getRowCount() {
-        return datos.length;
+        return data.length;
     }
 
     @Override
     public int getColumnCount() {
-        return columnas.length;
+        return columnNames.length;
     }
 
     @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {
-        return datos[rowIndex][columnIndex];
+    public Object getValueAt(int row, int col) {
+        return data[row][col];
     }
-    
+
+    @Override
+    public String getColumnName(int col) {
+        return columnNames[col];
+    }
+
+
+ 
 }
