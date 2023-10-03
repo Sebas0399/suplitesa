@@ -4,8 +4,22 @@
  */
 package com.mycompany.mavenproject1;
 
+import com.mycompany.mavenproject1.ui.Panel2;
+import com.mycompany.mavenproject1.ui.Panel1;
+import com.mycompany.mavenproject1.ui.FormMaterial;
+import com.mycompany.mavenproject1.tablas.TodosMaterial;
+import com.mycompany.mavenproject1.database.model.Cliente;
+import com.mycompany.mavenproject1.database.model.Material;
+import com.mycompany.mavenproject1.database.repository.ClienteDAO;
+import com.mycompany.mavenproject1.tablas.TodosMaterialReporte;
 import java.awt.Color;
+import javax.crypto.AEADBadTagException;
 import javax.swing.JPanel;
+import org.hibernate.Session;
+
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import com.mycompany.mavenproject1.database.repository.IClienteDAO;
 
 /**
  *
@@ -18,12 +32,19 @@ public class Principal extends javax.swing.JFrame {
      */
     public Principal() {
         initComponents();
-        Panel1 pan1=new Panel1();
-        Panel2 pan2=new Panel2(pan1.getPaths());
-        Panel3 pan3=new Panel3();
+        Panel1 pan1 = new Panel1();
+        Panel2 pan2 = new Panel2(pan1.getPaths());
+        FormMaterial pan3 = new FormMaterial();
+        TodosMaterial pan4=new TodosMaterial();
+        TodosMaterialReporte pan5= new TodosMaterialReporte();
         jInternalFrame1.add(pan1);
         jInternalFrame2.add(pan2);
-        jInternalFrame4.add(pan3);
+       // jInternalFrame4.add(pan3);
+       // jTabbedPane2.add(pan3);
+        jTabbedPane2.addTab("Añadir", pan3);
+        jTabbedPane2.addTab("Todos", pan4);
+        jTabbedPane3.add(pan5);
+
     }
 
     /**
@@ -39,9 +60,11 @@ public class Principal extends javax.swing.JFrame {
         jInternalFrame1 = new javax.swing.JInternalFrame();
         jInternalFrame2 = new javax.swing.JInternalFrame();
         jInternalFrame4 = new javax.swing.JInternalFrame();
+        jTabbedPane2 = new javax.swing.JTabbedPane();
+        jTabbedPane3 = new javax.swing.JTabbedPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(800, 600));
+        setMinimumSize(new java.awt.Dimension(1280, 720));
 
         jTabbedPane1.setTabPlacement(javax.swing.JTabbedPane.LEFT);
 
@@ -52,7 +75,10 @@ public class Principal extends javax.swing.JFrame {
         jTabbedPane1.addTab("Generador", jInternalFrame2);
 
         jInternalFrame4.setVisible(true);
-        jTabbedPane1.addTab("tab3", jInternalFrame4);
+        jInternalFrame4.getContentPane().add(jTabbedPane2, java.awt.BorderLayout.CENTER);
+
+        jTabbedPane1.addTab("Insumos", jInternalFrame4);
+        jTabbedPane1.addTab("Material", jTabbedPane3);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -60,14 +86,14 @@ public class Principal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 715, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -108,12 +134,14 @@ public class Principal extends javax.swing.JFrame {
             }
         });
     }
-   
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JInternalFrame jInternalFrame1;
     private javax.swing.JInternalFrame jInternalFrame2;
     private javax.swing.JInternalFrame jInternalFrame4;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTabbedPane jTabbedPane2;
+    private javax.swing.JTabbedPane jTabbedPane3;
     // End of variables declaration//GEN-END:variables
 }

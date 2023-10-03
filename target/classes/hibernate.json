@@ -1,0 +1,11 @@
+{
+  "hibernate": {
+    "connection": {
+      "driver_class": "org.postgresql.Driver",
+      "url": "jdbc:postgresql://localhost:5432/my_database",
+      "username": "my_username",
+      "password": "my_password"
+    },
+    "dialect": "org.hibernate.dialect.PostgreSQL10Dialect"
+  }
+}
