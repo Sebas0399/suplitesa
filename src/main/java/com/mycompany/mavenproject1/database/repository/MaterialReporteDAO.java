@@ -10,6 +10,7 @@ import com.mycompany.mavenproject1.database.model.MaterialReporte;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -29,22 +30,33 @@ public class MaterialReporteDAO implements IMaterialReporteDAO {
     }
 
     @Override
-    public void create(MaterialReporte material) {
+    public Boolean create(MaterialReporte material) {
+        String codigo = material.getCodigo(); // Suponiendo que hay un método getCodigo en tu entidad MaterialReporte
+        MaterialReporte existingMaterial = readByCodigo(codigo);
+        var succes = false;
+        if (existingMaterial != null) {
+            succes = false;
+            return succes; // 
+        }
+
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
-        
+
         try {
             transaction = session.beginTransaction();
             session.persist(material);
             transaction.commit();
+            succes = true;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
+                succes = false;
             }
             e.printStackTrace();
         } finally {
             session.close();
         }
+        return succes;
     }
 
     @Override
@@ -52,7 +64,7 @@ public class MaterialReporteDAO implements IMaterialReporteDAO {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
         List<MaterialReporte> materiales = new ArrayList<>();
-        
+
         try {
             transaction = session.beginTransaction();
             materiales = session.createQuery("SELECT m FROM MaterialReporte m", MaterialReporte.class).getResultList();
@@ -65,7 +77,7 @@ public class MaterialReporteDAO implements IMaterialReporteDAO {
         } finally {
             session.close();
         }
-        
+
         return materiales;
     }
 
@@ -73,7 +85,7 @@ public class MaterialReporteDAO implements IMaterialReporteDAO {
     public Boolean delete(String codigo) {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
-        
+
         try {
             transaction = session.beginTransaction();
             MaterialReporte reporte = readByCodigo(codigo);
@@ -119,4 +131,3 @@ public class MaterialReporteDAO implements IMaterialReporteDAO {
         return reporte;
     }
 }
-

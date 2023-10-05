@@ -11,15 +11,15 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import org.apache.poi.ss.usermodel.Cell;
 import static org.apache.poi.ss.usermodel.CellType.BOOLEAN;
 import static org.apache.poi.ss.usermodel.CellType.FORMULA;
@@ -78,55 +78,50 @@ public class PTGenerador {
     }
 
     private void generarFacturaExcel(List<Map<Integer, List<String>>> archivoGeneral) {
-        var listadoRUC = archivoGeneral.stream().map(x -> (x.get(2).get(0))).distinct().toList();
+        var listadoRUC = archivoGeneral.parallelStream().map(x -> (x.get(2).get(0))).distinct().toList();
         var listRuc = obtenerRucs(listadoRUC);
 
-        var listadoTotal = listRuc.stream().map(x -> getFacturasPorRuc(x, archivoGeneral)).toList();
+        var listadoTotal = listRuc.parallelStream().map(x -> getFacturasPorRuc(x, archivoGeneral)).toList();
+
+        
 
         listadoTotal.forEach(x -> {
-           
-                var lFinal = new ArrayList<List<String>>();
+            var lFinal = new ArrayList<List<String>>();
+            var contadorSerie = 1;
 
-                var contadorSerie = 1;
+            for (var y : x) {
+                var seguir = true;
+                var contadorFila = 4;
+                var contadorItem = 1;
 
-                for (var y : x) {
-                    var seguir = true;
-                    var contadorFila = 4;
-                    var contadorItem = 1;
-
-                    while (seguir) {
-                        var fila = y.get(contadorFila);
-                        if (fila.contains("TOTAL")) {
-                            seguir = false;
-                            //contadorItem = 0;
-                            contadorSerie++;
-                        } else {
-                            var p = List.of(fila.get(1), String.valueOf(contadorSerie), String.valueOf(contadorItem), Constantes.SUBPARTIDA_FC, Constantes.COMPLEMENTARIO_FC, Constantes.SUPLEMENTARIO_FC, fila.get(6), "U", fila.get(10));
-                            lFinal.add(p);
-                            contadorItem++;
-                            contadorFila++;
-                        }
-
+                while (seguir) {
+                    var fila = y.get(contadorFila);
+                    if (fila.contains("TOTAL")) {
+                        seguir = false;
+                        contadorSerie++;
+                    } else {
+                        var p = List.of(fila.get(1), String.valueOf(contadorSerie), String.valueOf(contadorItem), Constantes.SUBPARTIDA_FC, Constantes.COMPLEMENTARIO_FC, Constantes.SUPLEMENTARIO_FC, fila.get(6), "U", fila.get(10));
+                        lFinal.add(p);
+                        contadorItem++;
+                        contadorFila++;
                     }
-
-                    //var p = List.of(Constantes.SUBPARTIDA_FC, Constantes.COMPLEMENTARIO_FC, Constantes.SUPLEMENTARIO_FC, l.get(1), l.get(3));
-                
-                //  lFinal.stream().forEach(ab -> System.out.println(ab));
-               
+                }
                 generarExcel(lFinal, x.get(0).get(2).get(0));
+              
+
+               
             }
         });
+
+        JOptionPane.showMessageDialog(null, "Producto Terminado Generadas");
     }
 
     private void generarExcel(List<List<String>> lFinal, String nombreRuc) {
-
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet();
         List<List<String>> cabeceras = List.of(
-                List.of("No. Factura asociada", "el número de serie", "Numero de item", "Subpartida", "Complementario", "Suplementario", "Descripción", "Tipo Unidad", "Cantidad Transformado"
-                ),
-                List.of("ntfc_prdt_cl_cd", "sn", "prdt_item_sn", "prdt_hs_part_cd", "prdt_hs_cpmt_cd", "prdt_hs_spmt_cd", "prdt_prdt_desc", "prdt_ut_tp_cd", "prdt_trsm_use_qt"
-                )
+                List.of("No. Factura asociada", "el número de serie", "Numero de item", "Subpartida", "Complementario", "Suplementario", "Descripción", "Tipo Unidad", "Cantidad Transformado"),
+                List.of("ntfc_prdt_cl_cd", "sn", "prdt_item_sn", "prdt_hs_part_cd", "prdt_hs_cpmt_cd", "prdt_hs_spmt_cd", "prdt_prdt_desc", "prdt_ut_tp_cd", "prdt_trsm_use_qt")
         );
 
         int rowNumber = 0;
@@ -148,7 +143,6 @@ public class PTGenerador {
         String fileLocation = this.savePath + "\\" + "CRA_PT_" + nombreRuc + ".xls";
         try (FileOutputStream outputStream = new FileOutputStream(fileLocation)) {
             workbook.write(outputStream);
-            JOptionPane.showMessageDialog(null,"Producto Terminado Generado Correctamente");
         } catch (IOException ex) {
             Logger.getLogger(FCGenerador.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -161,7 +155,9 @@ public class PTGenerador {
     }
 
     public void cargarFacturas() {
-        try {
+        this.savePath = FileUtils.saveData();
+        if(this.savePath!=null){
+            try {
             List<Map<Integer, List<String>>> archivoGeneral = new ArrayList<>();
             FileInputStream file = new FileInputStream(new File(this.paths.get("RP")));
             Workbook workbook = new XSSFWorkbook(file);
@@ -176,7 +172,8 @@ public class PTGenerador {
                     data.put(j, new ArrayList<>());
                     for (Cell cell : row) {
                         switch (cell.getCellType()) {
-                            case STRING -> data.get(j).add(cell.getRichStringCellValue().getString());
+                            case STRING ->
+                                data.get(j).add(cell.getRichStringCellValue().getString());
                             case NUMERIC -> {
                                 if (DateUtil.isCellDateFormatted(cell)) {
                                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -185,21 +182,31 @@ public class PTGenerador {
                                     data.get(j).add((int) cell.getNumericCellValue() + "");
                                 }
                             }
-                            case BOOLEAN -> data.get(j).add(cell.getBooleanCellValue() + "");
-                            case FORMULA -> data.get(j).add(cell.getCellFormula() + "");
-                            default -> data.get(j).add(" ");
+                            case BOOLEAN ->
+                                data.get(j).add(cell.getBooleanCellValue() + "");
+                            case FORMULA ->
+                                data.get(j).add(cell.getCellFormula() + "");
+                            default ->
+                                data.get(j).add(" ");
                         }
                     }
                     j++;
                 }
                 archivoGeneral.add(data);
             }
-             this.savePath = FileUtils.saveData();
-            generarFacturaExcel(archivoGeneral);
-            
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Cargue el reporte de produccion");
+
+           
+
+            Thread generarFacturasThread = new Thread(() -> {
+                generarFacturaExcel(archivoGeneral);
+            });
+            generarFacturasThread.start();
+
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Cargue el reporte de producción");
             Logger.getLogger(FCGenerador.class.getName()).log(Level.SEVERE, null, ex);
         }
+        }
+        
     }
 }

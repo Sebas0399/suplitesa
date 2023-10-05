@@ -181,7 +181,7 @@ public class Panel1 extends javax.swing.JPanel {
                     }
                     i++;
                 }
-                System.out.println(data);
+                //System.out.println(data);
             } catch (Exception ex) {
                 Logger.getLogger(Panel1.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface IMaterialReporteDAO {
 
-    public void create(MaterialReporte material);
+    public Boolean create(MaterialReporte material);
     public Boolean delete(String codigo);
     public List<MaterialReporte> readAll();
     public MaterialReporte readByCodigo(String codigo);

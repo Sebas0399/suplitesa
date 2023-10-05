@@ -12,8 +12,9 @@ import java.util.List;
  * @author Sebas
  */
 public interface IMaterialDAO {
-    public void create(Material material);
+    public Boolean create(Material material);
     public List<Material> readAll();
     public Boolean delete(String subpartida);
-    public Material readBySubpartida(String subpartida);
+    public Material readByCodigo(String codigo);
+    public Boolean update(Material material);
 }

@@ -4,13 +4,12 @@
  */
 package com.mycompany.mavenproject1.tablas;
 
-import com.mycompany.mavenproject1.database.model.Material;
 import com.mycompany.mavenproject1.database.model.MaterialReporte;
 import com.mycompany.mavenproject1.database.repository.MaterialReporteDAO;
 import com.mycompany.mavenproject1.tablas.model.MPReporteTableModel;
-import com.mycompany.mavenproject1.tablas.model.MPTableModel;
 import com.mycompany.mavenproject1.tablas.model.RenderTable;
 import com.mycompany.mavenproject1.ui.FormMaterialReporte;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -28,8 +27,12 @@ public class TodosMaterialReporte extends javax.swing.JPanel {
     /**
      * Creates new form TodosMaterialReporte
      */
+    
     public TodosMaterialReporte() {
         initComponents();
+        this.jTable1.setRowHeight(30);
+        this.setBounds(0, 0, 800, 600);
+        this.setBackground(Color.LIGHT_GRAY);
         cargarDatos();
     }
 
@@ -167,13 +170,8 @@ public class TodosMaterialReporte extends javax.swing.JPanel {
                 delete
             };
         }
-        //  mr.create(material);
         MPReporteTableModel modelo = new MPReporteTableModel(datos);
-        //mr.readAll().stream().forEach(x -> this.jTable3.addr);
         this.jTable1.setModel(modelo);
-
-        //this.jTable3.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(new JTextField()));
-        // this.jTable1.setRowHeight(30);
         this.jTable1.setDefaultRenderer(Object.class, new RenderTable());
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables

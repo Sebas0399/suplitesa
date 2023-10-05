@@ -6,23 +6,18 @@ package com.mycompany.mavenproject1.tablas;
 
 import com.mycompany.mavenproject1.database.model.Material;
 import com.mycompany.mavenproject1.database.repository.MaterialDAO;
-import com.mycompany.mavenproject1.database.repository.MaterialReporteDAO;
 import com.mycompany.mavenproject1.tablas.model.MPTableModel;
 import com.mycompany.mavenproject1.tablas.model.RenderTable;
 import com.mycompany.mavenproject1.ui.FormMaterial;
-import com.mycompany.mavenproject1.ui.FormMaterialReporte;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.List;
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 
 /**
  *
@@ -35,11 +30,11 @@ public class TodosMaterial extends javax.swing.JPanel {
      */
     public TodosMaterial() {
         initComponents();
+
+        this.setBackground(Color.LIGHT_GRAY);
         this.cargarDatos();
         this.jTable3.getTableHeader().setPreferredSize(new Dimension(10, 30));
 
-        //List<List<Object>> datos2=List.of(List.of( "Algo","Algo","Algo","Algo","Algo","Algo","Algo","Algo","Algo", "SApo", "Perro", mod, delete));
-        //this.jTable3.(columnClass, renderer);
     }
 
     private void cargarDatos() {
@@ -56,7 +51,18 @@ public class TodosMaterial extends javax.swing.JPanel {
         Object[][] datos = new Object[materiales.size()][WIDTH];
         for (int i = 0; i < materiales.size(); i++) {
             Material materiaPrima = materiales.get(i);
-            System.out.println(materiaPrima.getCoeficienteConsumo());
+
+            var box1 = new JCheckBox();
+            if (materiaPrima.getCalculaDesperdicio() != null) {
+                box1.setSelected(materiaPrima.getCalculaDesperdicio());
+
+            }
+            var box2 = new JCheckBox();
+            if (materiaPrima.getAplicaFormula() != null) {
+                box2.setSelected(materiaPrima.getAplicaFormula());
+
+            }
+
             datos[i] = new Object[]{
                 materiaPrima.getCliente(),
                 materiaPrima.getCodigo(),
@@ -67,19 +73,16 @@ public class TodosMaterial extends javax.swing.JPanel {
                 materiaPrima.getPorcentajeDesperdicio(),
                 materiaPrima.getPorcentajeMerma(),
                 (materiaPrima.getCoeficienteConsumo() == null) ? "" : materiaPrima.getCoeficienteConsumo().doubleValue(),
-                materiaPrima.getCalculaDesperdicio(),
-                materiaPrima.getAplicaFormula(),
+                box1,
+                box2,
                 mod,
                 delete
             };
         }
 
-        //  mr.create(material);
         MPTableModel modelo = new MPTableModel(datos);
-        //mr.readAll().stream().forEach(x -> this.jTable3.addr);
         this.jTable3.setModel(modelo);
 
-        //this.jTable3.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(new JTextField()));
         this.jTable3.setRowHeight(30);
         this.jTable3.setDefaultRenderer(Object.class, new RenderTable());
 
@@ -169,7 +172,7 @@ public class TodosMaterial extends javax.swing.JPanel {
         dialog.setTitle("Insertar");
 
         dialog.getContentPane().add(fr);
-        dialog.setSize(500, 400);
+        dialog.setSize(800, 600);
         dialog.setVisible(true);
         dialog.addWindowListener(new WindowAdapter() {
             @Override
@@ -186,7 +189,7 @@ public class TodosMaterial extends javax.swing.JPanel {
         var row = this.jTable3.getSelectedRow();
         MaterialDAO mr = new MaterialDAO();
         System.out.println(col);
-                System.out.println(row);
+        System.out.println(row);
 
         if (col == 12) {
 
@@ -197,15 +200,15 @@ public class TodosMaterial extends javax.swing.JPanel {
                 mr.delete(codigo);
                 cargarDatos();
             }
-            //System.out.println(this.jTable1.getModel().getValueAt(row, 0));
-            //mr.delete();
+
         } else if (col == 11) {
-            FormMaterial fr = new FormMaterial();
+
+            FormMaterial fr = new FormMaterial(this.jTable3.getValueAt(row, 1).toString());
             JDialog dialog = new JDialog();
             dialog.setTitle("Actualizar");
 
             dialog.getContentPane().add(fr);
-            dialog.setSize(500, 400);
+            dialog.setSize(800, 600);
             dialog.setVisible(true);
             dialog.addWindowListener(new WindowAdapter() {
                 @Override

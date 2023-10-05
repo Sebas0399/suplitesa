@@ -22,20 +22,39 @@ import org.hibernate.cfg.Configuration;
 public class MaterialDAO implements IMaterialDAO {
 
     private SessionFactory sessionFactory;
-public MaterialDAO() {
+
+    public MaterialDAO() {
         sessionFactory = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Material.class).buildSessionFactory();
     }
+
     @Override
-    public void create(Material material) {
-        Session session = sessionFactory.getCurrentSession();
-        try {
-            session.beginTransaction();
-            session.persist(material);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            session.getTransaction().rollback();
-            e.printStackTrace();
+    public Boolean create(Material material) {
+        String codigo = material.getCodigo(); // Suponiendo que hay un método getCodigo en tu entidad MaterialReporte
+        Material existingMaterial = readByCodigo(codigo);
+        var succes=false;
+        if (existingMaterial != null) {
+            succes=false;
+            return succes; // 
         }
+
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+            session.persist(material);
+            transaction.commit();
+            succes=true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+                succes=false;
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return succes;
     }
 
     @Override
@@ -54,15 +73,14 @@ public MaterialDAO() {
     }
 
     // Otros métodos según tus necesidades...
-
     @Override
     public Boolean delete(String subpartida) {
- Session session = sessionFactory.openSession();
+        Session session = sessionFactory.openSession();
         Transaction transaction = null;
-        
+
         try {
             transaction = session.beginTransaction();
-            Material reporte = readBySubpartida(subpartida);
+            Material reporte = readByCodigo(subpartida);
             if (reporte != null) {
                 session.delete(reporte);
                 transaction.commit();
@@ -82,8 +100,8 @@ public MaterialDAO() {
     }
 
     @Override
-    public Material readBySubpartida(String codigo) {
-Session session = sessionFactory.openSession();
+    public Material readByCodigo(String codigo) {
+        Session session = sessionFactory.openSession();
         Transaction transaction = null;
         Material material = null;
 
@@ -103,5 +121,63 @@ Session session = sessionFactory.openSession();
         }
 
         return material;
+    }
+
+    public Boolean update(Material material) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+        var success = false;
+        try {
+            transaction = session.beginTransaction();
+            Material existingMaterial = readByCodigo(material.getCodigo());
+
+            if (existingMaterial != null) {
+                // Comprobar si los nuevos valores son nulos antes de asignarlos
+                if (material.getSubpartida() != null) {
+                    existingMaterial.setSubpartida(material.getSubpartida());
+                }
+                if (material.getDescripcion() != null) {
+                    existingMaterial.setDescripcion(material.getDescripcion());
+                }
+                if (material.getTipoUnidad() != null) {
+                    existingMaterial.setTipoUnidad(material.getTipoUnidad());
+                }
+                if (material.getSaldoInsumo() != null) {
+                    existingMaterial.setSaldoInsumo(material.getSaldoInsumo());
+                }
+                if (material.getPorcentajeMerma() != null) {
+                    existingMaterial.setPorcentajeMerma(material.getPorcentajeMerma());
+                }
+                if (material.getCoeficienteConsumo() != null) {
+                    existingMaterial.setCoeficienteConsumo(material.getCoeficienteConsumo());
+                }
+                if (material.getPorcentajeDesperdicio() != null) {
+                    existingMaterial.setPorcentajeDesperdicio(material.getPorcentajeDesperdicio());
+                }
+                if (material.getCalculaDesperdicio() != null) {
+                    existingMaterial.setCalculaDesperdicio(material.getCalculaDesperdicio());
+                }
+                if (material.getAplicaFormula() != null) {
+                    existingMaterial.setAplicaFormula(material.getAplicaFormula());
+                }
+                if (material.getCliente() != null) {
+                    existingMaterial.setCliente(material.getCliente());
+                }
+
+                // ... Actualizar otros atributos según sea necesario ...
+                session.update(existingMaterial); // Actualizar el material en la base de datos
+            }
+            transaction.commit();
+            success = true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+                success = false;
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return success;
     }
 }

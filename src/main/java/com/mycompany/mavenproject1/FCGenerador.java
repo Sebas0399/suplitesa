@@ -8,7 +8,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -16,6 +15,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import static org.apache.poi.ss.usermodel.CellType.BOOLEAN;
+import static org.apache.poi.ss.usermodel.CellType.FORMULA;
+import static org.apache.poi.ss.usermodel.CellType.NUMERIC;
+import static org.apache.poi.ss.usermodel.CellType.STRING;
 
 /**
  *
@@ -80,6 +83,7 @@ public class FCGenerador {
             generarExcel(lFinal, x.get(0).get(2).get(0));
 
         });
+        JOptionPane.showMessageDialog(null, "Facturas Generadas");
     }
 
     private void generarExcel(List<List<String>> lFinal, String nombreRuc) {
@@ -112,7 +116,6 @@ public class FCGenerador {
 
         try (FileOutputStream outputStream = new FileOutputStream(fileLocation)) {
             workbook.write(outputStream);
-            JOptionPane.showMessageDialog(null, "Factura Generado Correctamente");
 
         } catch (IOException ex) {
             Logger.getLogger(FCGenerador.class.getName()).log(Level.SEVERE, null, ex);
@@ -122,12 +125,15 @@ public class FCGenerador {
             workbook.close();
         } catch (IOException ex) {
             Logger.getLogger(FCGenerador.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "Ocurrio un errror");
+
         }
     }
 
     public void cargarFacturas() {
-
-        try {
+        this.savePath = FileUtils.saveData();
+        if(this.savePath!=null){
+            try {
             List<Map<Integer, List<String>>> archivoGeneral = new ArrayList<>();
             FileInputStream file = new FileInputStream(new File(this.paths.get("RP")));
 
@@ -165,11 +171,16 @@ public class FCGenerador {
                 }
                 archivoGeneral.add(data);
             }
-            this.savePath = FileUtils.saveData();
-            generarFacturaExcel(archivoGeneral);
-        } catch (Exception ex) {
+
+            Thread generarFacturasThread = new Thread(() -> {
+                generarFacturaExcel(archivoGeneral);
+            });
+            generarFacturasThread.start();
+        } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Cargue el reporte de produccion");
             Logger.getLogger(FCGenerador.class.getName()).log(Level.SEVERE, null, ex);
         }
+        }
+        
     }
 }

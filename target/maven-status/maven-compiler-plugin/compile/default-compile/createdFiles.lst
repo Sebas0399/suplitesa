@@ -38,6 +38,7 @@ com\mycompany\mavenproject1\tablas\TodosMaterialReporte.class
 com\mycompany\mavenproject1\Constantes.class
 com\mycompany\mavenproject1\FCGenerador.class
 com\mycompany\mavenproject1\ui\FormMaterial.class
+com\mycompany\mavenproject1\Principal$2.class
 com\mycompany\mavenproject1\MPGenerador.class
 com\mycompany\mavenproject1\database\model\Material.class
 com\mycompany\mavenproject1\ui\Panel2$2.class

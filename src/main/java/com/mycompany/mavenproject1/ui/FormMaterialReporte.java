@@ -19,7 +19,8 @@ import java.util.List;
 public class FormMaterialReporte extends javax.swing.JPanel {
 
     List<Material> insumos;
-
+    MaterialReporteDAO mr = new MaterialReporteDAO();
+    MaterialDAO md=new MaterialDAO();
     /**
      * Creates new form FormMaterialReporte
      */
@@ -32,15 +33,22 @@ public class FormMaterialReporte extends javax.swing.JPanel {
     public FormMaterialReporte(String codigo) {
         initComponents();
         cargarDatos();
-        this.txtMaterial.setText(codigo);
-        //this.comboInsumos.setSelectedIndex(WIDTH);
+        MaterialReporte materialReporte = mr.readByCodigo(codigo);
+        System.out.println(materialReporte);
+        this.txtMaterial.setText(materialReporte.getCodigo());
+        var itemSelected=this.insumos.stream().filter(x->x.getDescripcion().equals(materialReporte.getDescripcion()));
+                        //System.out.println(itemSelected.findAny().get().getDescripcion());
+
+        this.comboInsumos.setSelectedItem(itemSelected.findAny().get());
+       // this.comboInsumos.setSelectedIndex(materialReporte.getId());
     }
 
     public void cargarDatos() {
         MaterialDAO md = new MaterialDAO();
 
         insumos = md.readAll();
-        insumos.stream().forEach(x -> this.comboInsumos.addItem(x.toString()));
+        insumos.stream().forEach(x -> this.comboInsumos.addItem(x));
+
     }
 
     /**
@@ -128,7 +136,7 @@ public class FormMaterialReporte extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnGuardar;
-    private javax.swing.JComboBox<String> comboInsumos;
+    private javax.swing.JComboBox<Material> comboInsumos;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JTextField txtMaterial;
